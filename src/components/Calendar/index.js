@@ -7,26 +7,7 @@ import { calcFocusDate, generateStyles, getMonthDisplayRange } from '../../utils
 import classnames from 'classnames';
 import ReactList from 'react-list';
 import { shallowEqualObjects } from 'shallow-equal';
-import {
-  addMonths,
-  subMonths,
-  format,
-  eachDayOfInterval,
-  startOfWeek,
-  endOfWeek,
-  isSameDay,
-  addYears,
-  setYear,
-  setMonth,
-  differenceInCalendarMonths,
-  startOfMonth,
-  endOfMonth,
-  addDays,
-  isSameMonth,
-  differenceInDays,
-  min,
-  max,
-} from 'date-fns';
+import dateFns from 'date-fns';
 import defaultLocale from 'date-fns/locale/en-US';
 import coreStyles from '../../styles';
 import { ariaLabelsShape } from '../../accessibility';
@@ -82,7 +63,7 @@ class Calendar extends PureComponent {
   focusToDate = (date, props = this.props, preventUnnecessary = true) => {
     if (!props.scroll.enabled) {
       if (preventUnnecessary && props.preventSnapRefocus) {
-        const focusedDateDiff = differenceInCalendarMonths(date, this.state.focusedDate);
+        const focusedDateDiff = dateFns.differenceInCalendarMonths(date, this.state.focusedDate);
         const isAllowedForward = props.calendarFocus === 'forwards' && focusedDateDiff >= 0;
         const isAllowedBackward = props.calendarFocus === 'backwards' && focusedDateDiff <= 0;
         if ((isAllowedForward || isAllowedBackward) && Math.abs(focusedDateDiff) < props.months) {
@@ -92,7 +73,11 @@ class Calendar extends PureComponent {
       this.setState({ focusedDate: date });
       return;
     }
-    const targetMonthIndex = differenceInCalendarMonths(date, props.minDate, this.dateOptions);
+    const targetMonthIndex = dateFns.differenceInCalendarMonths(
+      date,
+      props.minDate,
+      this.dateOptions
+    );
     const visibleMonths = this.list.getVisibleRange();
     if (preventUnnecessary && visibleMonths.includes(targetMonthIndex)) return;
     this.isFirstRender = true;
@@ -159,13 +144,13 @@ class Calendar extends PureComponent {
     const { focusedDate } = this.state;
     const { onShownDateChange, minDate, maxDate } = this.props;
     const modeMapper = {
-      monthOffset: () => addMonths(focusedDate, value),
-      setMonth: () => setMonth(focusedDate, value),
-      setYear: () => setYear(focusedDate, value),
+      monthOffset: () => dateFns.addMonths(focusedDate, value),
+      setMonth: () => dateFns.setMonth(focusedDate, value),
+      setYear: () => dateFns.setYear(focusedDate, value),
       set: () => value,
     };
 
-    const newDate = min([max([modeMapper[mode](), minDate]), maxDate]);
+    const newDate = dateFns.min([dateFns.max([modeMapper[mode](), minDate]), maxDate]);
     this.focusToDate(newDate, this.props, false);
     onShownDateChange && onShownDateChange(newDate);
   };
@@ -180,8 +165,8 @@ class Calendar extends PureComponent {
     const visibleMonths = this.list.getVisibleRange();
     // prevent scroll jump with wrong visible value
     if (visibleMonths[0] === undefined) return;
-    const visibleMonth = addMonths(minDate, visibleMonths[0] || 0);
-    const isFocusedToDifferent = !isSameMonth(visibleMonth, focusedDate);
+    const visibleMonth = dateFns.addMonths(minDate, visibleMonths[0] || 0);
+    const isFocusedToDifferent = !dateFns.isSameMonth(visibleMonth, focusedDate);
     if (isFocusedToDifferent && !isFirstRender) {
       this.setState({ focusedDate: visibleMonth });
       onShownDateChange && onShownDateChange(visibleMonth);
@@ -258,14 +243,16 @@ class Calendar extends PureComponent {
     const now = new Date();
     return (
       <div className={this.styles.weekDays}>
-        {eachDayOfInterval({
-          start: startOfWeek(now, this.dateOptions),
-          end: endOfWeek(now, this.dateOptions),
-        }).map((day, i) => (
-          <span className={this.styles.weekDay} key={i}>
-            {format(day, this.props.weekdayDisplayFormat, this.dateOptions)}
-          </span>
-        ))}
+        {dateFns
+          .eachDayOfInterval({
+            start: dateFns.startOfWeek(now, this.dateOptions),
+            end: dateFns.endOfWeek(now, this.dateOptions),
+          })
+          .map((day, i) => (
+            <span className={this.styles.weekDay} key={i}>
+              {dateFns.format(day, this.props.weekdayDisplayFormat, this.dateOptions)}
+            </span>
+          ))}
       </div>
     );
   }
@@ -368,7 +355,7 @@ class Calendar extends PureComponent {
       startDate: this.state.drag.range.startDate,
       endDate: date,
     };
-    if (displayMode !== 'dateRange' || isSameDay(newRange.startDate, date)) {
+    if (displayMode !== 'dateRange' || dateFns.isSameDay(newRange.startDate, date)) {
       this.setState({ drag: { status: false, range: {} } }, () => onChange && onChange(date));
     } else {
       this.setState({ drag: { status: false, range: {} } }, () => {
@@ -396,9 +383,9 @@ class Calendar extends PureComponent {
       if (cache[index]) return cache[index];
     }
     if (direction === 'horizontal') return scrollArea.monthWidth;
-    const monthStep = addMonths(minDate, index);
+    const monthStep = dateFns.addMonths(minDate, index);
     const { start, end } = getMonthDisplayRange(monthStep, this.dateOptions);
-    const isLongMonth = differenceInDays(end, start, this.dateOptions) + 1 > 7 * 5;
+    const isLongMonth = dateFns.differenceInDays(end, start, this.dateOptions) + 1 > 7 * 5;
     return isLongMonth ? scrollArea.longMonthHeight : scrollArea.monthHeight;
   };
   render() {
@@ -449,9 +436,9 @@ class Calendar extends PureComponent {
               }}
               onScroll={this.handleScroll}>
               <ReactList
-                length={differenceInCalendarMonths(
-                  endOfMonth(maxDate),
-                  addDays(startOfMonth(minDate), -1),
+                length={dateFns.differenceInCalendarMonths(
+                  dateFns.endOfMonth(maxDate),
+                  dateFns.addDays(dateFns.startOfMonth(minDate), -1),
                   this.dateOptions
                 )}
                 treshold={500}
@@ -460,7 +447,7 @@ class Calendar extends PureComponent {
                 itemSizeEstimator={this.estimateMonthSize}
                 axis={isVertical ? 'y' : 'x'}
                 itemRenderer={(index, key) => {
-                  const monthStep = addMonths(minDate, index);
+                  const monthStep = dateFns.addMonths(minDate, index);
                   return (
                     <Month
                       {...this.props}
@@ -498,9 +485,9 @@ class Calendar extends PureComponent {
               isVertical ? this.styles.monthsVertical : this.styles.monthsHorizontal
             )}>
             {new Array(this.props.months).fill(null).map((_, i) => {
-              let monthStep = addMonths(this.state.focusedDate, i);
+              let monthStep = dateFns.addMonths(this.state.focusedDate, i);
               if (this.props.calendarFocus === 'backwards') {
-                monthStep = subMonths(this.state.focusedDate, this.props.months - 1 - i);
+                monthStep = dateFns.subMonths(this.state.focusedDate, this.props.months - 1 - i);
               }
               return (
                 <Month
@@ -553,8 +540,8 @@ Calendar.defaultProps = {
     enabled: false,
   },
   direction: 'vertical',
-  maxDate: addYears(new Date(), 20),
-  minDate: addYears(new Date(), -100),
+  maxDate: dateFns.addYears(new Date(), 20),
+  minDate: dateFns.addYears(new Date(), -100),
   rangeColors: ['#3d91ff', '#3ecf8e', '#fed14c'],
   startDatePlaceholder: 'Early',
   endDatePlaceholder: 'Continuous',

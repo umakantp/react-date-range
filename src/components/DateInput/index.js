@@ -1,7 +1,7 @@
 import React, { PureComponent } from 'react';
 import PropTypes from 'prop-types';
 import classnames from 'classnames';
-import { format, parse, isValid as isValidDateFns, isEqual } from 'date-fns';
+import dateFns from 'date-fns';
 
 class DateInput extends PureComponent {
   constructor(props, context) {
@@ -20,20 +20,20 @@ class DateInput extends PureComponent {
   componentDidUpdate(prevProps) {
     const { value } = prevProps;
 
-    if (!isEqual(value, this.props.value)) {
+    if (!dateFns.isEqual(value, this.props.value)) {
       this.setState({ value: this.formatDate(this.props) });
     }
   }
 
   isValid = value => {
-    return { isValidFormat: isValidDateFns(value), isInRange: this.props.isDateInRange(value) };
+    return { isValidFormat: dateFns.isValidDateFns(value), isInRange: this.props.isDateInRange(value) };
   };
 
   formatDate({ value, dateDisplayFormat, dateOptions }) {
     if (value) {
       const { isInRange, isValidFormat } = this.isValid(value);
       if (isInRange && isValidFormat) {
-        return format(value, dateDisplayFormat, dateOptions);
+        return dateFns.format(value, dateDisplayFormat, dateOptions);
       }
     }
 
@@ -51,7 +51,7 @@ class DateInput extends PureComponent {
     }
 
     const { onChange, dateDisplayFormat, dateOptions } = this.props;
-    const parsed = parse(value, dateDisplayFormat, new Date(), dateOptions);
+    const parsed = dateFns.parse(value, dateDisplayFormat, new Date(), dateOptions);
     const { isInRange, isValidFormat } = this.isValid(parsed);
     if (isInRange && isValidFormat) {
       this.setState({ changed: false }, () => onChange(parsed));
