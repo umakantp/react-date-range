@@ -93,6 +93,12 @@ Object.defineProperty(exports, "enGB", {
     return _enGB.default;
   }
 });
+Object.defineProperty(exports, "enIN", {
+  enumerable: true,
+  get: function () {
+    return _enIN.default;
+  }
+});
 Object.defineProperty(exports, "enUS", {
   enumerable: true,
   get: function () {
@@ -390,6 +396,7 @@ var _el = _interopRequireDefault(require("date-fns/locale/el"));
 var _enAU = _interopRequireDefault(require("date-fns/locale/en-AU"));
 var _enCA = _interopRequireDefault(require("date-fns/locale/en-CA"));
 var _enGB = _interopRequireDefault(require("date-fns/locale/en-GB"));
+var _enIN = _interopRequireDefault(require("date-fns/locale/en-IN"));
 var _enUS = _interopRequireDefault(require("date-fns/locale/en-US"));
 var _eo = _interopRequireDefault(require("date-fns/locale/eo"));
 var _es = _interopRequireDefault(require("date-fns/locale/es"));

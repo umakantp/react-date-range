@@ -4,22 +4,22 @@ Object.defineProperty(exports, "__esModule", {
   value: true
 });
 exports.default = void 0;
-var _react = _interopRequireWildcard(require("react"));
-var _propTypes = _interopRequireDefault(require("prop-types"));
-var _DayCell = require("../DayCell");
-var _Month = _interopRequireDefault(require("../Month"));
-var _DateInput = _interopRequireDefault(require("../DateInput"));
-var _utils = require("../../utils");
 var _classnames = _interopRequireDefault(require("classnames"));
-var _reactList = _interopRequireDefault(require("react-list"));
-var _shallowEqual = require("shallow-equal");
 var dateFns = _interopRequireWildcard(require("date-fns"));
 var _enUS = require("date-fns/locale/en-US");
-var _styles = _interopRequireDefault(require("../../styles"));
+var _propTypes = _interopRequireDefault(require("prop-types"));
+var _react = _interopRequireWildcard(require("react"));
+var _reactList = _interopRequireDefault(require("react-list"));
+var _shallowEqual = require("shallow-equal");
 var _accessibility = require("../../accessibility");
-function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
+var _styles = _interopRequireDefault(require("../../styles"));
+var _utils = require("../../utils");
+var _DateInput = _interopRequireDefault(require("../DateInput"));
+var _DayCell = require("../DayCell");
+var _Month = _interopRequireDefault(require("../Month"));
 function _getRequireWildcardCache(e) { if ("function" != typeof WeakMap) return null; var r = new WeakMap(), t = new WeakMap(); return (_getRequireWildcardCache = function (e) { return e ? t : r; })(e); }
 function _interopRequireWildcard(e, r) { if (!r && e && e.__esModule) return e; if (null === e || "object" != typeof e && "function" != typeof e) return { default: e }; var t = _getRequireWildcardCache(r); if (t && t.has(e)) return t.get(e); var n = { __proto__: null }, a = Object.defineProperty && Object.getOwnPropertyDescriptor; for (var u in e) if ("default" !== u && Object.prototype.hasOwnProperty.call(e, u)) { var i = a ? Object.getOwnPropertyDescriptor(e, u) : null; i && (i.get || i.set) ? Object.defineProperty(n, u, i) : n[u] = e[u]; } return n.default = e, t && t.set(e, n), n; }
+function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
 function _extends() { _extends = Object.assign ? Object.assign.bind() : function (target) { for (var i = 1; i < arguments.length; i++) { var source = arguments[i]; for (var key in source) { if (Object.prototype.hasOwnProperty.call(source, key)) { target[key] = source[key]; } } } return target; }; return _extends.apply(this, arguments); }
 function _defineProperty(obj, key, value) { key = _toPropertyKey(key); if (key in obj) { Object.defineProperty(obj, key, { value: value, enumerable: true, configurable: true, writable: true }); } else { obj[key] = value; } return obj; }
 function _toPropertyKey(t) { var i = _toPrimitive(t, "string"); return "symbol" == typeof i ? i : String(i); }
@@ -184,7 +184,6 @@ class Calendar extends _react.PureComponent {
       const {
         focusedRange,
         color,
-        ranges,
         rangeColors,
         dateDisplayFormat,
         editableDateInputs,
@@ -194,6 +193,7 @@ class Calendar extends _react.PureComponent {
       } = this.props;
       const defaultColor = rangeColors[focusedRange[0]] || color;
       const styles = this.styles;
+      const ranges = (0, _utils.restrictMinMaxDate)(this.props.ranges, this.props.minDate, this.props.maxDate);
       return /*#__PURE__*/_react.default.createElement("div", {
         className: styles.dateDisplayWrapper
       }, ranges.map((range, i) => {
@@ -327,7 +327,9 @@ class Calendar extends _react.PureComponent {
     this.dateOptions = {
       locale: _props.locale
     };
-    if (_props.weekStartsOn !== undefined) this.dateOptions.weekStartsOn = _props.weekStartsOn;
+    if (_props.weekStartsOn !== undefined) {
+      this.dateOptions.weekStartsOn = _props.weekStartsOn;
+    }
     this.styles = (0, _utils.generateStyles)([_styles.default, _props.classNames]);
     this.listSizeCache = {};
     this.isFirstRender = true;
@@ -439,7 +441,8 @@ class Calendar extends _react.PureComponent {
     } = this.state;
     const isVertical = direction === 'vertical';
     const monthAndYearRenderer = navigatorRenderer || this.renderMonthAndYear;
-    const ranges = this.props.ranges.map((range, i) => ({
+    const oldRanges = (0, _utils.restrictMinMaxDate)(this.props.ranges, this.props.minDate, this.props.maxDate);
+    const ranges = oldRanges.map((range, i) => ({
       ...range,
       color: range.color || rangeColors[i] || color
     }));

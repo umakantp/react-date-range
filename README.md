@@ -1,4 +1,7 @@
 # @umakantp/react-date-range
+[![npm](https://img.shields.io/npm/v/@umakantp/react-date-range)](https://www.npmjs.com/package/@umakantp/react-date-range)
+[![npm](https://img.shields.io/npm/l/@umakantp/react-date-range)]()
+[![npm](https://img.shields.io/npm/dw/@umakantp/react-date-range)](https://www.npmjs.com/package/@umakantp/react-date-range)
 [![sponsors](https://img.shields.io/github/sponsors/hypeserver)](https://github.com/sponsors/hypeserver)
 
 
@@ -51,18 +54,19 @@ import '@umakantp/react-date-range/dist/theme/default.css'; // theme css file
 ```javascript
 import { Calendar } from '@umakantp/react-date-range';
 
-class MyComponent extends Component {
-  handleSelect(date){
+function App() {
+  const handleSelect(date) {
     console.log(date); // native Date object
   }
-  render(){
-    return (
+
+  return (
+    <div>
       <Calendar
         date={new Date()}
-        onChange={this.handleSelect}
+        onChange={handleSelect}
       />
-    )
-  }
+    </div>
+  );
 }
 
 ```
@@ -71,8 +75,8 @@ class MyComponent extends Component {
 ```javascript
 import { DateRangePicker } from '@umakantp/react-date-range';
 
-class MyComponent extends Component {
-  handleSelect(ranges){
+function App() {
+  const handleSelect = (ranges) => {
     console.log(ranges);
     // {
     //   selection: {
@@ -80,20 +84,20 @@ class MyComponent extends Component {
     //     endDate: [native Date Object],
     //   }
     // }
-  }
-  render(){
-    const selectionRange = {
-      startDate: new Date(),
-      endDate: new Date(),
-      key: 'selection',
-    }
-    return (
-      <DateRangePicker
-        ranges={[selectionRange]}
-        onChange={this.handleSelect}
-      />
-    )
-  }
+  };
+
+  const selectionRange = {
+    startDate: new Date(),
+    endDate: new Date(),
+    key: 'selection'
+  };
+
+  return (
+    <DateRangePicker
+      ranges={[selectionRange]}
+      onChange={handleSelect}
+    />
+  );
 }
 
 ```
@@ -102,10 +106,9 @@ class MyComponent extends Component {
 
 Property                             | type      | Default Value    | Description
 -------------------------------------|-----------|------------------|-----------------------------------------------------------------
-locale                               | Object    | enUS from locale | you can view full list from [here](https://github.com/umakantp/react-date-range/tree/next/src/locale/index.js). Locales directly exported from [`date-fns/locales`](https://date-fns.org/docs/I18n#supported-languages).
+locale                               | Object    | enUS from locale | you can view full list from [here](https://github.com/umakantp/react-date-range/blob/master/src/locale/index.js). Locales directly exported from [`date-fns/locales`](https://date-fns.org/docs/I18n#supported-languages).
 className                            | String    |                  | wrapper classname
 months                               | Number    | 1                | rendered month count
-showSelectionPreview                 | Boolean   | true             | show preview on focused/hovered dates
 showMonthAndYearPickers              | Boolean   | true             | show select tags for month and year on calendar top, if false it will just display the month and year
 rangeColors                          | String[]  |                  | defines color for selection preview.
 shownDate                            | Date      |                  | initial focus date
@@ -204,7 +207,7 @@ If you prefer, you can overwrite calendar sizes with `calendarWidth`/`calendarHe
   - Update CHANGELOG.md
 - Make sure the demo and important features are working as expected
 - After merging, tag the master commit with `release/<new_version>` and let Github Action handle publishing
-- = Profit 🙈
+- = Win 🙈
 
 ### TODOs
 

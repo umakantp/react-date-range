@@ -1,21 +1,23 @@
-import React, { Component } from 'react';
+import classnames from 'classnames';
 import PropTypes from 'prop-types';
+import React, { Component } from 'react';
+import coreStyles from '../../styles';
+import { findNextRangeIndex, generateStyles, restrictMinMaxDate } from '../../utils';
 import DateRange from '../DateRange';
 import DefinedRange from '../DefinedRange';
-import { findNextRangeIndex, generateStyles } from '../../utils';
-import classnames from 'classnames';
-import coreStyles from '../../styles';
 
 class DateRangePicker extends Component {
   constructor(props) {
     super(props);
+    const ranges = restrictMinMaxDate(props.ranges, props.minDate, props.maxDate);
     this.state = {
-      focusedRange: [findNextRangeIndex(props.ranges), 0],
+      focusedRange: [findNextRangeIndex(ranges), 0],
     };
     this.styles = generateStyles([coreStyles, props.classNames]);
   }
   render() {
     const { focusedRange } = this.state;
+    const ranges = restrictMinMaxDate(this.props.ranges, this.props.minDate, this.props.maxDate);
     return (
       <div className={classnames(this.styles.dateRangePickerWrapper, this.props.className)}>
         <DefinedRange
@@ -26,13 +28,14 @@ class DateRangePicker extends Component {
             )
           }
           {...this.props}
-          range={this.props.ranges[focusedRange[0]]}
+          range={ranges[focusedRange[0]]}
           className={undefined}
         />
         <DateRange
           onRangeFocusChange={focusedRange => this.setState({ focusedRange })}
           focusedRange={focusedRange}
           {...this.props}
+          ranges={ranges}
           ref={t => (this.dateRange = t)}
           className={undefined}
         />

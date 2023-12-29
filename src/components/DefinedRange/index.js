@@ -1,10 +1,12 @@
-import React, { Component } from 'react';
+import cx from 'classnames';
+import * as dateFns from 'date-fns';
 import PropTypes from 'prop-types';
-import styles from '../../styles';
+import React, { Component } from 'react';
 import { defaultInputRanges, defaultStaticRanges } from '../../defaultRanges';
+import styles from '../../styles';
+import { restrictMinMaxDate } from '../../utils';
 import { rangeShape } from '../DayCell';
 import InputRangeField from '../InputRangeField';
-import cx from 'classnames';
 
 class DefinedRange extends Component {
   constructor(props) {
@@ -16,11 +18,14 @@ class DefinedRange extends Component {
   }
 
   handleRangeChange = range => {
-    const { onChange, ranges, focusedRange } = this.props;
+    const { onChange, ranges, focusedRange, minDate, maxDate } = this.props;
     const selectedRange = ranges[focusedRange[0]];
-    if (!onChange || !selectedRange) return;
+    if (!onChange || !selectedRange) {
+      return;
+    }
+    const newRange = restrictMinMaxDate([range], minDate, maxDate)[0];
     onChange({
-      [selectedRange.key || `range${focusedRange[0] + 1}`]: { ...selectedRange, ...range },
+      [selectedRange.key || `range${focusedRange[0] + 1}`]: { ...selectedRange, ...newRange },
     });
   };
 
@@ -55,13 +60,51 @@ class DefinedRange extends Component {
       renderStaticRangeLabel,
       rangeColors,
       className,
+      minDate,
+      maxDate,
     } = this.props;
+
+    const validStaticRanges = staticRanges.filter(staticRange => {
+      const rangeValue = staticRange.range(this.props);
+      if (rangeValue && maxDate && dateFns.isAfter(rangeValue.startDate, maxDate)) {
+        return false;
+      }
+      if (rangeValue && minDate && dateFns.isBefore(rangeValue.endDate, minDate)) {
+        return false;
+      }
+      return true;
+    });
+
+    const validInputRanges = inputRanges.filter(rangeOption => {
+      const value = this.getRangeOptionValue(rangeOption);
+      const rangeValue = rangeOption.range(value, this.props);
+      const isStartDateValid = dateFns.isValid(rangeValue.startDate);
+      const isEndDateValid = dateFns.isValid(rangeValue.endDate);
+
+      if (rangeValue && minDate && isStartDateValid && dateFns.isBefore(rangeValue.startDate, minDate)) {
+        return false;
+      }
+      if (rangeValue && maxDate && isStartDateValid && dateFns.isAfter(rangeValue.startDate, maxDate)) {
+        return false;
+      }
+      if (rangeValue && maxDate && isEndDateValid && dateFns.isAfter(rangeValue.endDate, maxDate)) {
+        return false;
+      }
+      if (rangeValue && minDate && isEndDateValid && dateFns.isBefore(rangeValue.endDate, minDate)) {
+        return false;
+      }
+      return true;
+    });
+
+    if (validInputRanges.length === 0 && validStaticRanges.length === 0) {
+      return null;
+    }
 
     return (
       <div className={cx(styles.definedRangesWrapper, className)}>
         {headerContent}
         <div className={styles.staticRanges}>
-          {staticRanges.map((staticRange, i) => {
+          {validStaticRanges.map((staticRange, i) => {
             const { selectedRange, focusedRangeIndex } = this.getSelectedRange(ranges, staticRange);
             let labelContent;
 
@@ -70,7 +113,7 @@ class DefinedRange extends Component {
             } else {
               labelContent = staticRange.label;
             }
-
+            const rangeValue = staticRange.range(this.props);
             return (
               <button
                 type="button"
@@ -78,19 +121,16 @@ class DefinedRange extends Component {
                   [styles.staticRangeSelected]: Boolean(selectedRange),
                 })}
                 style={{
-                  color: selectedRange
-                    ? selectedRange.color || rangeColors[focusedRangeIndex]
-                    : null,
+                  color: selectedRange ? selectedRange.color || rangeColors[focusedRangeIndex] : null,
                 }}
                 key={i}
-                onClick={() => this.handleRangeChange(staticRange.range(this.props))}
-                onFocus={() => onPreviewChange && onPreviewChange(staticRange.range(this.props))}
-                onMouseOver={() =>
-                  onPreviewChange && onPreviewChange(staticRange.range(this.props))
-                }
+                onClick={() => this.handleRangeChange(rangeValue)}
+                onFocus={() => onPreviewChange && onPreviewChange(rangeValue)}
+                onMouseOver={() => onPreviewChange && onPreviewChange(rangeValue)}
                 onMouseLeave={() => {
                   onPreviewChange && onPreviewChange();
-                }}>
+                }}
+              >
                 <span tabIndex={-1} className={styles.staticRangeLabel}>
                   {labelContent}
                 </span>
@@ -99,14 +139,14 @@ class DefinedRange extends Component {
           })}
         </div>
         <div className={styles.inputRanges}>
-          {inputRanges.map((rangeOption, i) => (
+          {validInputRanges.map((rangeOption, i) => (
             <InputRangeField
               key={i}
               styles={styles}
               label={rangeOption.label}
               onFocus={() => this.setState({ focusedInput: i, rangeOffset: 0 })}
               onBlur={() => this.setState({ rangeOffset: 0 })}
-              onChange={value => this.handleRangeChange(rangeOption.range(value, this.props))}
+              onChange={newValue => this.handleRangeChange(rangeOption.range(newValue, this.props))}
               value={this.getRangeOptionValue(rangeOption)}
             />
           ))}
@@ -129,6 +169,8 @@ DefinedRange.propTypes = {
   rangeColors: PropTypes.arrayOf(PropTypes.string),
   className: PropTypes.string,
   renderStaticRangeLabel: PropTypes.func,
+  minDate: PropTypes.object,
+  maxDate: PropTypes.object,
 };
 
 DefinedRange.defaultProps = {

@@ -8,6 +8,7 @@ exports.calcNewSelection = calcNewSelection;
 exports.findNextRangeIndex = findNextRangeIndex;
 exports.generateStyles = generateStyles;
 exports.getMonthDisplayRange = getMonthDisplayRange;
+exports.restrictMinMaxDate = restrictMinMaxDate;
 var _classnames = _interopRequireDefault(require("classnames"));
 var dateFns = _interopRequireWildcard(require("date-fns"));
 function _getRequireWildcardCache(e) { if ("function" != typeof WeakMap) return null; var r = new WeakMap(), t = new WeakMap(); return (_getRequireWildcardCache = function (e) { return e ? t : r; })(e); }
@@ -82,10 +83,32 @@ function generateStyles(sources) {
   }, {});
   return generatedStyles;
 }
+function restrictMinMaxDate(ranges, minDate, maxDate) {
+  return ranges.map(r => {
+    if (!r) {
+      return r;
+    }
+    let endDate = r.endDate;
+    if (endDate && maxDate) {
+      endDate = dateFns.min([endDate, maxDate]);
+    }
+    let startDate = r.startDate;
+    if (startDate && minDate) {
+      startDate = dateFns.max([startDate, minDate]);
+    }
+    return {
+      ...r,
+      startDate,
+      endDate
+    };
+  });
+}
 function calcNewSelection(value, isSingleValue, focusedRange, ranges, onChange, maxDate, moveRangeOnFirstSelection, retainEndDateOnFirstSelection, disabledDates) {
   const focusedRangeIndex = focusedRange[0];
   const selectedRange = ranges[focusedRangeIndex];
-  if (!selectedRange || !onChange) return {};
+  if (!selectedRange || !onChange) {
+    return {};
+  }
   let {
     startDate,
     endDate
@@ -112,7 +135,9 @@ function calcNewSelection(value, isSingleValue, focusedRange, ranges, onChange, 
     };
     startDate = value;
     endDate = calculateEndDate();
-    if (maxDate) endDate = dateFns.min([endDate, maxDate]);
+    if (maxDate) {
+      endDate = dateFns.min([endDate, maxDate]);
+    }
     nextFocusRange = [focusedRange[0], 1];
   } else {
     endDate = value;

@@ -1,19 +1,19 @@
 "use strict";
 
-var _react = _interopRequireDefault(require("react"));
-var _react2 = require("@testing-library/react");
-var _DefinedRange = _interopRequireDefault(require("../DefinedRange"));
+var _react = require("@testing-library/react");
+var _react2 = _interopRequireDefault(require("react"));
 var dateFns = _interopRequireWildcard(require("date-fns"));
+var _DefinedRange = _interopRequireDefault(require("../DefinedRange"));
 function _getRequireWildcardCache(e) { if ("function" != typeof WeakMap) return null; var r = new WeakMap(), t = new WeakMap(); return (_getRequireWildcardCache = function (e) { return e ? t : r; })(e); }
 function _interopRequireWildcard(e, r) { if (!r && e && e.__esModule) return e; if (null === e || "object" != typeof e && "function" != typeof e) return { default: e }; var t = _getRequireWildcardCache(r); if (t && t.has(e)) return t.get(e); var n = { __proto__: null }, a = Object.defineProperty && Object.getOwnPropertyDescriptor; for (var u in e) if ("default" !== u && Object.prototype.hasOwnProperty.call(e, u)) { var i = a ? Object.getOwnPropertyDescriptor(e, u) : null; i && (i.get || i.set) ? Object.defineProperty(n, u, i) : n[u] = e[u]; } return n.default = e, t && t.set(e, n), n; }
 function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
 describe('DefinedRange tests', () => {
   test('Should call "renderStaticRangeLabel" callback correct amount of times according to the "hasCustomRendering" option', () => {
     const renderStaticRangeLabel = jest.fn();
-    (0, _react2.render)( /*#__PURE__*/_react.default.createElement(_DefinedRange.default, {
+    (0, _react.render)( /*#__PURE__*/_react2.default.createElement(_DefinedRange.default, {
       staticRanges: [{
         label: 'Dynamic Label',
-        range: {},
+        range: () => ({}),
         isSelected(range) {
           const definedRange = this.range();
           return dateFns.isSameDay(range.startDate, definedRange.startDate) && dateFns.isSameDay(range.endDate, definedRange.endDate);
@@ -21,14 +21,14 @@ describe('DefinedRange tests', () => {
         hasCustomRendering: true
       }, {
         label: 'Static Label',
-        range: {},
+        range: () => ({}),
         isSelected(range) {
           const definedRange = this.range();
           return dateFns.isSameDay(range.startDate, definedRange.startDate) && dateFns.isSameDay(range.endDate, definedRange.endDate);
         }
       }, {
         label: 'Hede',
-        range: {},
+        range: () => ({}),
         isSelected(range) {
           const definedRange = this.range();
           return dateFns.isSameDay(range.startDate, definedRange.startDate) && dateFns.isSameDay(range.endDate, definedRange.endDate);
@@ -40,13 +40,13 @@ describe('DefinedRange tests', () => {
     expect(renderStaticRangeLabel).toHaveBeenCalledTimes(2);
   });
   test('Should render dynamic static label contents correctly', () => {
-    const renderItalicLabelContent = () => /*#__PURE__*/_react.default.createElement("i", {
+    const renderItalicLabelContent = () => /*#__PURE__*/_react2.default.createElement("i", {
       className: 'italic-label-content'
     }, 'Italic Content');
-    const renderBoldLabelContent = () => /*#__PURE__*/_react.default.createElement("b", {
+    const renderBoldLabelContent = () => /*#__PURE__*/_react2.default.createElement("b", {
       className: 'bold-label-content'
     }, 'Bold Content');
-    const renderSomethingElse = () => /*#__PURE__*/_react.default.createElement("img", {
+    const renderSomethingElse = () => /*#__PURE__*/_react2.default.createElement("img", {
       className: 'random-image'
     });
     const renderStaticRangeLabel = function (staticRange) {
@@ -60,10 +60,10 @@ describe('DefinedRange tests', () => {
       }
       return result;
     };
-    const wrapper = (0, _react2.render)( /*#__PURE__*/_react.default.createElement(_DefinedRange.default, {
+    const wrapper = (0, _react.render)( /*#__PURE__*/_react2.default.createElement(_DefinedRange.default, {
       staticRanges: [{
         id: 'italic',
-        range: {},
+        range: () => ({}),
         isSelected(range) {
           const definedRange = this.range();
           return dateFns.isSameDay(range.startDate, definedRange.startDate) && dateFns.isSameDay(range.endDate, definedRange.endDate);
@@ -71,14 +71,14 @@ describe('DefinedRange tests', () => {
         hasCustomRendering: true
       }, {
         label: 'Static Label',
-        range: {},
+        range: () => ({}),
         isSelected(range) {
           const definedRange = this.range();
           return dateFns.isSameDay(range.startDate, definedRange.startDate) && dateFns.isSameDay(range.endDate, definedRange.endDate);
         }
       }, {
         id: 'whatever',
-        range: {},
+        range: () => ({}),
         isSelected(range) {
           const definedRange = this.range();
           return dateFns.isSameDay(range.startDate, definedRange.startDate) && dateFns.isSameDay(range.endDate, definedRange.endDate);
@@ -86,7 +86,7 @@ describe('DefinedRange tests', () => {
         hasCustomRendering: true
       }, {
         id: 'bold',
-        range: {},
+        range: () => ({}),
         isSelected(range) {
           const definedRange = this.range();
           return dateFns.isSameDay(range.startDate, definedRange.startDate) && dateFns.isSameDay(range.endDate, definedRange.endDate);
