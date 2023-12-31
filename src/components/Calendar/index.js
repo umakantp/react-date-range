@@ -34,7 +34,10 @@ class Calendar extends PureComponent {
     };
   }
   isDateInRange = date => {
-    return date >= this.props.minDate && date <= this.props.maxDate;
+    return (
+      dateFns.isAfter(date, dateFns.subDays(this.props.minDate, 1)) &&
+      dateFns.isBefore(date, dateFns.addDays(this.props.maxDate, 1))
+    );
   };
   getMonthNames() {
     return [...Array(12).keys()].map(i => this.props.locale.localize.month(i));

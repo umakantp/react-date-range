@@ -26,7 +26,7 @@ class DateInput extends PureComponent {
   }
 
   isValid = value => {
-    return { isValidFormat: dateFns.isValidDateFns(value), isInRange: this.props.isDateInRange(value) };
+    return { isValidFormat: dateFns.isValid(value), isInRange: this.props.isDateInRange(value) };
   };
 
   formatDate({ value, dateDisplayFormat, dateOptions }) {
