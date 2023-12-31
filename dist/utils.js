@@ -91,16 +91,18 @@ function restrictMinMaxDate(ranges, minDate, maxDate) {
     let endDate = r.endDate;
     if (endDate && maxDate) {
       endDate = dateFns.min([endDate, maxDate]);
+      if (!dateFns.isEqual(r.endDate, endDate)) {
+        r.endDate = endDate;
+      }
     }
     let startDate = r.startDate;
     if (startDate && minDate) {
       startDate = dateFns.max([startDate, minDate]);
+      if (!dateFns.isEqual(r.startDate, startDate)) {
+        r.startDate = startDate;
+      }
     }
-    return {
-      ...r,
-      startDate,
-      endDate
-    };
+    return r;
   });
 }
 function calcNewSelection(value, isSingleValue, focusedRange, ranges, onChange, maxDate, moveRangeOnFirstSelection, retainEndDateOnFirstSelection, disabledDates) {

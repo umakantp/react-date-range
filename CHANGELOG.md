@@ -4,6 +4,15 @@ All notable changes to this project will be documented in this file.
 The format is based on [Keep a Changelog](http://keepachangelog.com/en/1.0.0/)
 and this project adheres to [Semantic Versioning](http://semver.org/spec/v2.0.0.html).
 
+## 2.2.0
+
+### Added
+- Touch support.
+
+### Changed
+- Bug fix: Moving to next month, and then hovering date was taking user back to selected dates.
+- Validate date input (typing) for being within min and max date range.
+
 ## 2.1.1
 
 ### Removed

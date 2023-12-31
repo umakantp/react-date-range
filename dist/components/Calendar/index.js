@@ -29,6 +29,9 @@ class Calendar extends _react.PureComponent {
     var _this;
     super(_props, context);
     _this = this;
+    _defineProperty(this, "isDateInRange", date => {
+      return dateFns.isAfter(date, dateFns.subDays(this.props.minDate, 1)) && dateFns.isBefore(date, dateFns.addDays(this.props.maxDate, 1));
+    });
     _defineProperty(this, "focusToDate", function (date) {
       let props = arguments.length > 1 && arguments[1] !== undefined ? arguments[1] : _this.props;
       let preventUnnecessary = arguments.length > 2 && arguments[2] !== undefined ? arguments[2] : true;
@@ -216,7 +219,8 @@ class Calendar extends _react.PureComponent {
           dateDisplayFormat: dateDisplayFormat,
           ariaLabel: ariaLabels.dateInput && ariaLabels.dateInput[range.key] && ariaLabels.dateInput[range.key].startDate,
           onChange: this.onDragSelectionEnd,
-          onFocus: () => this.handleRangeFocusChange(i, 0)
+          onFocus: () => this.handleRangeFocusChange(i, 0),
+          isDateInRange: this.isDateInRange
         }), /*#__PURE__*/_react.default.createElement(_DateInput.default, {
           className: (0, _classnames.default)(styles.dateDisplayItem, {
             [styles.dateDisplayItemActive]: focusedRange[0] === i && focusedRange[1] === 1
@@ -229,7 +233,8 @@ class Calendar extends _react.PureComponent {
           dateDisplayFormat: dateDisplayFormat,
           ariaLabel: ariaLabels.dateInput && ariaLabels.dateInput[range.key] && ariaLabels.dateInput[range.key].endDate,
           onChange: this.onDragSelectionEnd,
-          onFocus: () => this.handleRangeFocusChange(i, 1)
+          onFocus: () => this.handleRangeFocusChange(i, 1),
+          isDateInRange: this.isDateInRange
         }));
       }));
     });
@@ -389,14 +394,16 @@ class Calendar extends _react.PureComponent {
       date: 'date'
     };
     const targetProp = propMapper[this.props.displayMode];
-    if (this.props[targetProp] !== prevProps[targetProp]) {
+    if (!(0, _shallowEqual.shallowEqualObjects)(this.props[targetProp], prevProps[targetProp])) {
       this.updateShownDate(this.props);
     }
     if (prevProps.locale !== this.props.locale || prevProps.weekStartsOn !== this.props.weekStartsOn) {
       this.dateOptions = {
         locale: this.props.locale
       };
-      if (this.props.weekStartsOn !== undefined) this.dateOptions.weekStartsOn = this.props.weekStartsOn;
+      if (this.props.weekStartsOn !== undefined) {
+        this.dateOptions.weekStartsOn = this.props.weekStartsOn;
+      }
       this.setState({
         monthNames: this.getMonthNames()
       });
