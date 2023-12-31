@@ -1,5 +1,5 @@
+import { fireEvent, render, screen } from '@testing-library/react';
 import React from 'react';
-import { mount } from 'enzyme';
 
 import DateInput from './index';
 
@@ -12,7 +12,7 @@ describe('DateInput tests', () => {
   test('Should set invalidFormat in state to true', () => {
     const isDateInRange = jest.fn();
 
-    const wrapper = mount(
+    render(
       <DateInput
         readOnly={false}
         disabled={false}
@@ -21,17 +21,19 @@ describe('DateInput tests', () => {
         onFocus={onFocus}
         isDateInRange={isDateInRange}
         dateDisplayFormat={'MMM d, yyyy'}
+        placeholder="Date input"
       />
     );
-    const input = wrapper.find('input');
-    input.simulate('change', { target: { value: 'fooo' } });
-    input.simulate('keydown', { key: 'Enter' });
-    expect(wrapper.state().invalid.invalidFormat).toEqual(true);
+
+    fireEvent.change(screen.getByPlaceholderText('Date input'), { target: { value: 'fooo' } });
+    fireEvent.keyDown(screen.getByPlaceholderText('Date input'), { key: 'Enter' });
+    expect(screen.getByText('The date format is invalid')).toBeInTheDocument();
   });
+
   test('Should set outOfRange in state to true', () => {
     const isDateInRange = jest.fn(() => false);
 
-    const wrapper = mount(
+    render(
       <DateInput
         readOnly={false}
         disabled={false}
@@ -40,17 +42,18 @@ describe('DateInput tests', () => {
         onFocus={onFocus}
         isDateInRange={isDateInRange}
         dateDisplayFormat={'MMM d, yyyy'}
+        placeholder="Date input"
       />
     );
-    const input = wrapper.find('input');
-    input.simulate('change', { target: { value: 'Dec 8, 2021' } });
-    input.simulate('keydown', { key: 'Enter' });
-    expect(wrapper.state().invalid.outOfRange).toEqual(true);
+
+    fireEvent.change(screen.getByPlaceholderText('Date input'), { target: { value: 'Dec 8, 2021' } });
+    fireEvent.keyDown(screen.getByPlaceholderText('Date input'), { key: 'Enter' });
+    expect(screen.getByText('The date is out of range')).toBeInTheDocument();
   });
   test('Should call this.props.onChange if valid date', () => {
     const isDateInRange = jest.fn(() => true);
 
-    const wrapper = mount(
+    render(
       <DateInput
         readOnly={false}
         disabled={false}
@@ -59,11 +62,12 @@ describe('DateInput tests', () => {
         onFocus={onFocus}
         isDateInRange={isDateInRange}
         dateDisplayFormat={'MMM d, yyyy'}
+        placeholder="Date input"
       />
     );
-    const input = wrapper.find('input');
-    input.simulate('change', { target: { value: 'Dec 8, 2021' } });
-    input.simulate('keydown', { key: 'Enter' });
+
+    fireEvent.change(screen.getByPlaceholderText('Date input'), { target: { value: 'Dec 8, 2021' } });
+    fireEvent.keyDown(screen.getByPlaceholderText('Date input'), { key: 'Enter' });
     expect(onChange).toHaveBeenCalledTimes(1);
   });
 });
