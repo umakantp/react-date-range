@@ -1,7 +1,7 @@
-import React, { PureComponent } from 'react';
-import PropTypes from 'prop-types';
 import classnames from 'classnames';
 import * as dateFns from 'date-fns';
+import PropTypes from 'prop-types';
+import React, { PureComponent } from 'react';
 
 class DateInput extends PureComponent {
   constructor(props, context) {
@@ -99,8 +99,8 @@ class DateInput extends PureComponent {
     const tooltipWarningMessage = invalidFormat
       ? 'The date format is invalid'
       : outOfRange
-      ? 'The date is out of range'
-      : '';
+        ? 'The date is out of range'
+        : '';
 
     return (
       <span
@@ -108,7 +108,8 @@ class DateInput extends PureComponent {
           { rdrInvalidDateInput: invalidFormat || outOfRange },
           'rdrDateInput',
           className
-        )}>
+        )}
+      >
         <input
           readOnly={readOnly}
           disabled={disabled}
@@ -121,9 +122,7 @@ class DateInput extends PureComponent {
           onFocus={onFocus}
         />
         {(invalidFormat || outOfRange) && <span className="rdrWarning">&#9888;</span>}
-        {tooltipWarningMessage && (
-          <span className="rdrTooltipWarning">{tooltipWarningMessage}</span>
-        )}
+        {tooltipWarningMessage && <span className="rdrTooltipWarning">{tooltipWarningMessage}</span>}
       </span>
     );
   }
